@@ -4,11 +4,13 @@
  */
 
 var express = require('express');
+var sys = require("sys");
 
 var app = module.exports = express.createServer();
+var GitHubApi = require("./support/node-github/lib/github").GitHubApi;
+var github = new GitHubApi(true);
 
 // Configuration
-
 app.configure(function(){
     app.set('views', __dirname + '/views');
     app.use(express.bodyDecoder());
@@ -37,8 +39,8 @@ app.get('/', function(req, res){
 });
 
 app.post('/analyze', function(req, res){
-    console.log(req);
-    console.log(res);
+    console.log(req.body.username);
+    github.getUserApi().getFollowers(req.body.username, function(err, followers) { sys.puts(followers.join('\n')); });
     res.send('Crup');
 });
 
