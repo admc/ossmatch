@@ -10,7 +10,13 @@
   	var submitUser = function(){
 			$.post("analyze", $("#userForm").serialize(),
 			   function(data){
-			     alert(data.name); // John
+					var names = [];
+					for (var i=0;i<data.length;i++){
+						names.push(data[i].name);
+					}
+					$.post("languages", {'username':$("#username")[0].value,'languages':JSON.stringify(names)}, function(data){
+						alert(data);
+					}, "json");
 			   }, "json");
 		}
   </script>
@@ -38,10 +44,13 @@
   <div style="height:100px"> </div>
   <div align="center">
 	<form onsubmit="submitUser(); return false;" id="userForm">
-		<input name="username" type="text" style="font-size:24px;width:300px;height:40px;" /><br><br>
+		<input id="username" name="username" type="text" style="font-size:24px;width:300px;height:40px;" /><br><br>
 		<input style="height:50px;width:100px;font-size:25px" type="submit" value="GO">
 	</form>
   </div>
+	<div>
+		<div></div><div></div>
+	</div>
 </body>
 </html>
 

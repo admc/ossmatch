@@ -33,20 +33,43 @@ app.set('view options', {
 });
 
 // Routes
-
 app.get('/', function(req, res){
-    res.render('index.ejs');
+  res.render('index.ejs');
 });
 
+app.post('/languages', function(req, res){
+  var langs = JSON.parse(req.body.languages);
+  console.log(typeof langs);
+  console.log(langs[0]);
+  for (var i=0;i<langs.length;i++){
+    console.log(langs[i]);
+    github.getRepoApi().getRepoLanguages(req.body.username, langs[i], function(err, languages) { 
+      console.log(languages);
+    }); 
+  }
+  res.send('Crup');
+});
+
+
 app.post('/analyze', function(req, res){
-    console.log(req.body.username);
-    github.getUserApi().getFollowers(req.body.username, function(err, followers) { sys.puts(followers.join('\n')); });
-    res.send('Crup');
+  github.getRepoApi().getUserRepos(req.body.username, function(err, repos) {
+    var repoList = [];
+    var langList = [];
+    for (var i=0;i<repos.length;i++){
+      if (!repos[i].fork){
+        repoList.push(repos[i]);
+      }
+    }
+    res.writeHead(200, {"Content-Type": "text/plain"});
+    res.end(JSON.stringify(repoList));
+  });
+  //github.getUserApi().getFollowers(req.body.username, function(err, followers) { sys.puts(followers.join('\n')); });
+  //res.send('Crup');
 });
 
 // Only listen on $ node app.js
 
 if (!module.parent) {
-    app.listen(3000);
-    console.log("Express server listening on port %d", app.address().port)
+  app.listen(3000);
+  console.log("Express server listening on port %d", app.address().port)
 }
