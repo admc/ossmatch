@@ -39,15 +39,21 @@ app.get('/', function(req, res){
 
 app.post('/languages', function(req, res){
   var langs = JSON.parse(req.body.languages);
-  console.log(typeof langs);
-  console.log(langs[0]);
-  for (var i=0;i<langs.length;i++){
-    console.log(langs[i]);
-    github.getRepoApi().getRepoLanguages(req.body.username, langs[i], function(err, languages) { 
-      console.log(languages);
-    }); 
-  }
-  res.send('Crup');
+  var langObj = {};
+  
+  var counter = 0
+  
+  langs.forEach(function(lang) {
+    github.getRepoApi().getRepoLanguages(req.body.username, lang, function(err, languages){
+      langObj[lang] = languages;
+      counter += 1
+      if (counter === langs.length) {
+        res.writeHead(200, {"Content-Type": "text/plain"});
+        res.write(JSON.stringify(langObj));
+        res.end()
+      }
+    });
+  })
 });
 
 
@@ -61,7 +67,8 @@ app.post('/analyze', function(req, res){
       }
     }
     res.writeHead(200, {"Content-Type": "text/plain"});
-    res.end(JSON.stringify(repoList));
+    res.write(JSON.stringify(repoList));
+    res.end();
   });
   //github.getUserApi().getFollowers(req.body.username, function(err, followers) { sys.puts(followers.join('\n')); });
   //res.send('Crup');
